@@ -19,6 +19,17 @@ public class SearchLog {
         numUsages = 0;
         isLocked = false;
     }
+
+    public String logSearch(String query) {
+        if (isLocked) {
+            return "[Log está bloqueado: não foi possível registrar query]";
+        }
+        this.searchHistory.add(query);
+        this.numUsages++;
+        this.searchCount.merge(query, 1, Integer::sum);
+        return getLogEntry();
+    }
+
     public void addSearchHistory(String searchHistory) {
         this.searchHistory.add(searchHistory);
     }
@@ -26,11 +37,6 @@ public class SearchLog {
     public void recordSearch(String query) {
         addSearchHistory(query);
         this.numUsages = this.numUsages + 1;
-    }
-
-    public String logSearch(String query) {
-        recordSearch(query);
-        return getLogEntry();
     }
 
     public List<String> getSearchHistory() {
