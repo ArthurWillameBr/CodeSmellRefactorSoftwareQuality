@@ -15,6 +15,21 @@ public class CardManager {
         this.cards = new HashMap<Integer, Card>();
     }
 
+    public String formatAllCards() {
+        Map<Integer, Card> cards = this.getCardsMap();
+        if (cards.isEmpty()) {
+            return "No cards";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<Integer, Card> e : cards.entrySet()) {
+            sb.append("[id: ").append(e.getKey()).append("] ")
+                    .append("Question: ").append(e.getValue().getQuestion())
+                    .append(", Answer: ").append(e.getValue().getAnswer())
+                    .append("\n");
+        }
+        return sb.toString();
+    }
+
     public static CardManager getCardManager() {
         if (instance == null) {
             instance = new CardManager();
