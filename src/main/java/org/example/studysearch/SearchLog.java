@@ -22,10 +22,17 @@ public class SearchLog {
     public void addSearchHistory(String searchHistory) {
         this.searchHistory.add(searchHistory);
     }
+
     public void recordSearch(String query) {
         addSearchHistory(query);
         this.numUsages = this.numUsages + 1;
     }
+
+    public String logSearch(String query) {
+        recordSearch(query);
+        return getLogEntry();
+    }
+
     public List<String> getSearchHistory() {
         return searchHistory;
     }
