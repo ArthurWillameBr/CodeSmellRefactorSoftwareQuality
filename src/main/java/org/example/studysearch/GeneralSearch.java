@@ -12,6 +12,8 @@ import java.util.List;
 public class GeneralSearch implements Search<String> {
     private final SearchLog searchLog = new SearchLog("General Search");
 
+    public GeneralSearch() {}
+
     @Override
     public List<String> search(String text) {
         List<String> results = new ArrayList<>();
@@ -22,5 +24,12 @@ public class GeneralSearch implements Search<String> {
         results.addAll(StudyTaskManager.getStudyTaskManager().searchInRegistries(text));
         results.add(searchLog.recordSearch(text));
         return results;
+    }
+
+    /**
+     * Legacy accessor for controller compatibility.
+     */
+    public SearchLog getSearchLog() {
+        return searchLog;
     }
 }

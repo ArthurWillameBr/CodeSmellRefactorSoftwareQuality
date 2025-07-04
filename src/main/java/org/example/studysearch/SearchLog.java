@@ -3,11 +3,11 @@ package org.example.studysearch;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Encapsulates search logging behavior,
@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class SearchLog {
     private final String logName;
-    private final List<String> history = new ArrayList<>();
+    private final LinkedList<String> history = new LinkedList<>();
     private final Map<String, Integer> counts = new HashMap<>();
     private boolean locked;
     private int totalUsages;
@@ -41,10 +41,34 @@ public class SearchLog {
     }
 
     /**
-     * Returns an unmodifiable view of the search history.
+     * Adds a search term to history without recording timestamp or counts.
+     * Kept for legacy tests.
+     */
+    public void addSearchHistory(String term) {
+        history.add(term);
+    }
+
+    /**
+     * @deprecated Use getHistory() instead.
+     */
+    @Deprecated
+    public LinkedList<String> getSearchHistory() {
+        return history;
+    }
+
+    /**
+     * Returns an unmodifiable copy of the search history.
      */
     public List<String> getHistory() {
-        return Collections.unmodifiableList(history);
+        return history.stream().collect(Collectors.toUnmodifiableList());
+    }
+
+    /**
+     * @deprecated Use getTotalUsages() instead.
+     */
+    @Deprecated
+    public int getNumUsages() {
+        return totalUsages;
     }
 
     /**
@@ -69,7 +93,7 @@ public class SearchLog {
         counts.entrySet().stream()
                 .sorted((e1, e2) -> e2.getValue() - e1.getValue())
                 .limit(topN)
-                .forEach(e -> sb.append(e.getKey()).append(" (" + e.getValue() + ")\n"));
+                .forEach(e -> sb.append(e.getKey()).append(" (").append(e.getValue()).append(")\n"));
         return sb.toString();
     }
 
