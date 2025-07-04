@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static org.example.controllers.MainController.getInput;
 import static org.example.controllers.MainController.validateInput;
+import org.example.studymaterial.AudioEditData;
 
 public class StudyRegistryController {
     private StudyTaskManager studyTaskManager = StudyTaskManager.getStudyTaskManager();
@@ -112,14 +113,43 @@ public class StudyRegistryController {
         studyTaskManager.addRegistry(goal);
     }
 
+    // ✅ MÉTODO REFATORADO - Apenas 3 linhas (sem NcssCount)
     private void editAudio(AudioReference audioReference){
         handleMethodHeader("(Audio Edit)");
         System.out.println("Type the following info:  AudioReference. AudioQuality audioQuality, boolean isDownloadable, " +
                 "String title, String description, String link, String accessRights, String license, String language, int rating, " +
                 "int viewCount, int shareCount \n");
-        AudioReference.AudioQuality quality =AudioReference.audioQualityAdapter(getInput());
-        audioReference.editAudio(quality, Boolean.parseBoolean(getInput()), getInput(), getInput(), getInput(), getInput(),
-                getInput(), getInput(), Integer.parseInt(getInput()), Integer.parseInt(getInput()), Integer.parseInt(getInput()));
+        new AudioEditor(audioReference).execute();
+    }
+
+    // ✅ METHOD OBJECT - Encapsula toda a lógica de coleta e edição
+    private class AudioEditor {
+        private final AudioReference audioReference;
+
+        public AudioEditor(AudioReference audioReference) {
+            this.audioReference = audioReference;
+        }
+
+        public void execute() {
+            AudioEditData data = collectInputsAndBuildData();
+            audioReference.editAudio(data);
+        }
+
+        private AudioEditData collectInputsAndBuildData() {
+            return new AudioEditData.Builder()
+                    .withAudioQuality(AudioReference.audioQualityAdapter(getInput()))
+                    .isDownloadable(Boolean.parseBoolean(getInput()))
+                    .withTitle(getInput())
+                    .withDescription(getInput())
+                    .withLink(getInput())
+                    .withAccessRights(getInput())
+                    .withLicense(getInput())
+                    .withLanguage(getInput())
+                    .withRating(Integer.parseInt(getInput()))
+                    .withViewCount(Integer.parseInt(getInput()))
+                    .withShareCount(Integer.parseInt(getInput()))
+                    .build();
+        }
     }
 
     private AudioReference addAudioReference(){
