@@ -1,61 +1,103 @@
+// SearchLog.java
 package org.example.studysearch;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Encapsulates search logging behavior,
+ * providing history, usage counts and summaries.
+ */
 public class SearchLog {
-    private List<String> searchHistory;
-    private Map<String, Integer> searchCount;
-    private boolean isLocked;
-    private Integer numUsages;
-    private String logName;
+    private final String logName;
+    private final List<String> history = new ArrayList<>();
+    private final Map<String, Integer> counts = new HashMap<>();
+    private boolean locked;
+    private int totalUsages;
+
+    private static final DateTimeFormatter TIMESTAMP_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public SearchLog(String logName) {
-        searchHistory = new ArrayList<>();
-        searchCount = new HashMap<>();
         this.logName = logName;
-        numUsages = 0;
-        isLocked = false;
-    }
-    public void addSearchHistory(String searchHistory) {
-        this.searchHistory.add(searchHistory);
-    }
-    public List<String> getSearchHistory() {
-        return searchHistory;
-    }
-    public void setSearchHistory(List<String> searchHistory) {
-        this.searchHistory = searchHistory;
-    }
-    public Map<String, Integer> getSearchCount() {
-        return searchCount;
-    }
-    public void setSearchCount(Map<String, Integer> searchCount) {
-        this.searchCount = searchCount;
     }
 
+    /**
+     * Records a search term, increments counters and returns the log entry message.
+     */
+    public String recordSearch(String term) {
+        if (locked) {
+            return "[LOG LOCKED]";
+        }
+        history.add(term);
+        counts.put(term, counts.getOrDefault(term, 0) + 1);
+        totalUsages++;
+        String timestamp = LocalDateTime.now().format(TIMESTAMP_FMT);
+        return String.format("[%s] Logged in: %s (usage #%d)", timestamp, logName, totalUsages);
+    }
+
+    /**
+     * Returns an unmodifiable view of the search history.
+     */
+    public List<String> getHistory() {
+        return Collections.unmodifiableList(history);
+    }
+
+    /**
+     * Returns the total number of searches performed.
+     */
+    public int getTotalUsages() {
+        return totalUsages;
+    }
+
+    /**
+     * Returns the count for a specific search term.
+     */
+    public int getCountFor(String term) {
+        return counts.getOrDefault(term, 0);
+    }
+
+    /**
+     * Provides a formatted summary of top searched terms.
+     */
+    public String getSummary(int topN) {
+        StringBuilder sb = new StringBuilder("Top " + topN + " search terms:\n");
+        counts.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue() - e1.getValue())
+                .limit(topN)
+                .forEach(e -> sb.append(e.getKey()).append(" (" + e.getValue() + ")\n"));
+        return sb.toString();
+    }
+
+    /**
+     * Locks further logging.
+     */
+    public void lock() {
+        this.locked = true;
+    }
+
+    /**
+     * Unlocks logging.
+     */
+    public void unlock() {
+        this.locked = false;
+    }
+
+    /**
+     * Checks if logging is locked.
+     */
     public boolean isLocked() {
-        return isLocked;
+        return locked;
     }
 
-    public void setLocked(boolean locked) {
-        isLocked = locked;
-    }
-
-    public Integer getNumUsages() {
-        return numUsages;
-    }
-
-    public void setNumUsages(Integer numUsages) {
-        this.numUsages = numUsages;
-    }
-
+    /**
+     * Returns the log's name.
+     */
     public String getLogName() {
         return logName;
-    }
-
-    public void setLogName(String logName) {
-        this.logName = logName;
     }
 }
