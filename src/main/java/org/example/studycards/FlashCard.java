@@ -18,6 +18,14 @@ public class FlashCard extends StudyMethod{
 
     }
 
+    public String getRandomCardDescription(CardManager manager) {
+        Integer id = randomFlashCard();
+        if (id == null) {
+            return "No card found";
+        }
+        return manager.formatCard(id);
+    }
+
     public int randomFlashCard(){
         List<Card> cards = cardManager.getCards();
         if (cards.isEmpty()) {
