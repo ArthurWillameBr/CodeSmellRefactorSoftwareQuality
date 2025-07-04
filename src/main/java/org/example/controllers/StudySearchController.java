@@ -92,8 +92,7 @@ public class StudySearchController {
     private void handleGetRegistrySearchLog(){
         handleMethodHeader("(Get Search Log)");
         SearchLog registryLog = registrySearch.getSearchLog();
-        String response = registryLog.getLogName() + " was used: " + registryLog.getNumUsages() + " times\nSearch Log\n";
-        response += String.join(", ", registryLog.getSearchHistory());
+        String response = formatSearchLog(registryLog);
         System.out.println(response);
     }
 
@@ -122,3 +121,4 @@ public class StudySearchController {
                """);
     }
 }
+
