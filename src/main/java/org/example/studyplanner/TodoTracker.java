@@ -1,22 +1,14 @@
 package org.example.studyplanner;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class TodoTracker {
-    private List<ToDo> toDos = new ArrayList<>();
-    private Map<Integer, List<LocalDateTime>> tracker;
-    private Integer nextId;
+    private final List<ToDo> toDos = new ArrayList<>();
+    private Integer nextId = 1;
     private static TodoTracker instance;
 
-
-    private TodoTracker() {
-        this.tracker = new HashMap<>();
-        this.toDos = new ArrayList<>();
-        this.nextId = 1;
-    }
+    private TodoTracker() {}
 
     public static TodoTracker getInstance() {
         if (instance == null) {
@@ -25,79 +17,59 @@ public class TodoTracker {
         return instance;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder str = new StringBuilder();
-        for (ToDo toDo : toDos) {
-            String todoInfo = toDo.toString();
-            str.append(todoInfo);
-            str.append("\n");
-            Integer id = toDo.getId();
-            List<LocalDateTime> todosDate = this.tracker.get(id);
-            if(todosDate == null){
-                str.append("No tracks found\n");
-            }else{
-                for (LocalDateTime ldt : todosDate) {
-                    String pattern = "yyyy-MM-dd HH:mm:ss";
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-                    String formattedDate = formatter.format(ldt);
-                    str.append(formattedDate);
-                    str.append("\n");
-                }
-            }
-        }
-        String response = str.toString();
-        if(response.isEmpty()){
-            return "No ToDos found";
-        }
-        return response;
-    }
-
-    public void addToDoExecutionTime(Integer id){
-        List<LocalDateTime> et = tracker.computeIfAbsent(id, k -> new ArrayList<>());
-        LocalDateTime now = LocalDateTime.now();
-        et.add(now);
-    }
-
-    public List<ToDo> getToDos() {
-        return toDos;
-    }
-
-    public ToDo getToDoById(Integer id) {
-        for (ToDo toDo : toDos) {
-            if (toDo.getId() == id) {
-                return toDo;
-            }
-        }
-        return null;
-    }
-
-    public Integer addToDo(String title, String description, Integer priority) {
+    public Integer addToDo(String title, String description, int priority) {
         ToDo toAdd = new ToDo(nextId, title, description, priority);
         nextId++;
-        this.toDos.add(toAdd);
+        toDos.add(toAdd);
         return toAdd.getId();
     }
 
     public void removeToDo(Integer id) {
-        toDos.removeIf(toDo -> toDo.getId() == id);
+        toDos.removeIf(t -> t.getId().equals(id));
+    }
+
+    public void addToDoExecutionTime(Integer id) {
+        ToDo td = getToDoById(id);
+        if (td != null) td.addExecutionTime();
+    }
+
+    public ToDo getToDoById(Integer id) {
+        return toDos.stream()
+                .filter(t -> t.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public List<ToDo> getToDos() {
+        return new ArrayList<>(toDos);
     }
 
     public List<ToDo> sortTodosByPriority() {
-        List<ToDo> sortedToDos = new ArrayList<>(toDos);
-        sortedToDos.sort(Comparator.comparingInt(ToDo::getPriority));
-        return sortedToDos;
+        List<ToDo> sorted = new ArrayList<>(toDos);
+        sorted.sort((a, b) -> Integer.compare(a.getPriority(), b.getPriority()));
+        return sorted;
     }
 
     public List<String> searchInTodos(String search) {
-        List<String> todos = new ArrayList<>();
-        for (ToDo toDo : toDos) {
-            if (toDo.getTitle().toLowerCase().contains(search.toLowerCase()) || toDo.getDescription().toLowerCase().contains(search.toLowerCase())) {
-                todos.add(toDo.toString());
-            }
+        List<String> matched = new ArrayList<>();
+        for (ToDo t : toDos) {
+            if (t.matches(search)) matched.add(t.toString());
         }
-        return todos;
+        return matched;
     }
 
-
+    /**
+     * Retorna todas as ToDos formatadas em string, incluindo execuções.
+     */
+    @Override
+    public String toString() {
+        if (toDos.isEmpty()) {
+            return "No ToDos found";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (ToDo t : toDos) {
+            sb.append(t.toString());
+        }
+        return sb.toString();
+    }
 }
