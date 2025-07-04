@@ -86,9 +86,7 @@ public class StudySearchController {
     private void handleGetMaterialSearchLog(){
         handleMethodHeader("(Get Search Log)");
         SearchLog materialLog = materialSearch.getSearchLog();
-        String response = materialLog.getLogName() + " was used: " + materialLog.getNumUsages() + " times\nSearch Log\n";
-        response += String.join(", ", materialLog.getSearchHistory());
-        System.out.println(response);
+        System.out.println(formatSearchLog(materialLog));
     }
 
     private void handleGetRegistrySearchLog(){
