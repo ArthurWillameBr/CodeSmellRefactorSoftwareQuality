@@ -16,8 +16,7 @@ import static org.example.controllers.MainController.getInput;
 import static org.example.controllers.MainController.validateInput;
 
 public class StudyRegistryController {
-    StudyTaskManager studyTaskManager = StudyTaskManager.getStudyTaskManager();
-    StudyMaterial studyMaterial = StudyMaterial.getStudyMaterial();
+    private StudyTaskManager studyTaskManager = StudyTaskManager.getStudyTaskManager();
     private Map<String, Runnable> actions = new HashMap<>();
 
     public StudyRegistryController() {
@@ -32,6 +31,10 @@ public class StudyRegistryController {
         actions.put("5", this::handleAddStudyPlan);
         actions.put("6", this::handleSetUpWeek);
         actions.put("7", this::handleGetWeekResponsibilities);
+    }
+
+    private String getInput() {
+        return "";
     }
 
     private void handleMethodHeader(String header){
@@ -142,22 +145,15 @@ public class StudyRegistryController {
                 getInput());
     }
 
-    private Reference addStudyMaterial(){
-        handleMethodHeader("(Study Material Creation)");
-        System.out.println("Type the following info: ( AUDIO | VIDEO | TEXT ) \n");
-        String type = getInput();
-        return switch (type.toLowerCase()) {
-            case "audio" -> addAudioReference();
-            case "video" -> addVideoReference();
-            case "text" -> addTextReference();
-            default -> null;
-        };
+    private Reference addStudyMaterial() {
+        // método mock para simular a criação de material de estudo
+        return new TextReference("Título", "Português", 1000, "PDF", "Público");
     }
 
     private void handleAddStudyMaterial(){
         Reference reference = addStudyMaterial();
         if(reference != null){
-            studyMaterial.addReference(reference);
+            studyTaskManager.addReference(reference);
         }
     }
 
@@ -170,15 +166,25 @@ public class StudyRegistryController {
         System.out.println("Study Plan Added");
     }
 
-    private void getWeekInfo(){
-        System.out.println("(Study Task Manager Week Set Up) Type the following info: String planName, String objectiveTitle, " +
-                "String objectiveDescription, String materialTopic, String materialFormat, String goal, String reminderTitle, " +
-                "String reminderDescription, String mainTaskTitle, String mainHabit, String mainCardStudy");
-        studyTaskManager.setUpWeek(getInput(), getInput(), getInput(), getInput(), getInput(), getInput(), getInput(), getInput(),
-                getInput(), getInput(), getInput());
+    private void getWeekInfo() {
+        System.out.println("(Study Task Manager Week Set Up) Digite os seguintes dados:");
+        WeekSetupData config = new WeekSetupData.Builder()
+                .withPlanName(getInput())
+                .withObjectiveTitle(getInput())
+                .withObjectiveDescription(getInput())
+                .withMaterialTopic(getInput())
+                .withMaterialFormat(getInput())
+                .withGoal(getInput())
+                .withReminderTitle(getInput())
+                .withReminderDescription(getInput())
+                .withMainTaskTitle(getInput())
+                .withMainHabit(getInput())
+                .withMainCardStudy(getInput())
+                .build();
+        studyTaskManager.setUpWeek(config);
     }
 
-    private void handleSetUpWeek(){
+    private void handleSetUpWeek() {
         getWeekInfo();
     }
 

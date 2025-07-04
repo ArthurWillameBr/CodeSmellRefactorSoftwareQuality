@@ -8,14 +8,15 @@ import java.util.List;
 
 public class StudyTaskManager {
     private static StudyTaskManager instance;
+    private WeekSetupData lastWeekConfig;
     private StudyMaterial studyMaterial = StudyMaterial.getStudyMaterial();
-    List<Registry> registryList;
-    List<String> weekResponsibilities = List.of();
+    private List<Registry> registryList;
+    private List<String> weekResponsibilities;
 
     private StudyTaskManager(){
-        this.registryList = new ArrayList<Registry>();
+        this.registryList = new ArrayList<>();
+        this.weekResponsibilities = new ArrayList<>();
     }
-
     public static StudyTaskManager getStudyTaskManager(){
         if (instance == null) {
             instance = new StudyTaskManager();
@@ -27,19 +28,47 @@ public class StudyTaskManager {
         return weekResponsibilities;
     }
 
-    public void setUpWeek(String planName, String objectiveTitle, String objectiveDescription, String materialTopic,
-                          String materialFormat, String goal, String reminderTitle, String reminderDescription,
-                          String mainTaskTitle, String mainHabit, String mainCardStudy){
-        this.weekResponsibilities = new ArrayList<>();
-        this.weekResponsibilities.addAll(Arrays.asList(planName, objectiveTitle, objectiveDescription, materialTopic, materialFormat, goal, reminderTitle, reminderDescription, mainTaskTitle, mainHabit, mainCardStudy));
+    public void handleSetUpWeek(List<String> stringProperties) {
+        if (stringProperties.size() != 11) {
+            throw new IllegalArgumentException("A lista deve conter exatamente 11 elementos.");
+        }
+        WeekSetupData config = new WeekSetupData.Builder()
+                .withPlanName(stringProperties.get(0))
+                .withObjectiveTitle(stringProperties.get(1))
+                .withObjectiveDescription(stringProperties.get(2))
+                .withMaterialTopic(stringProperties.get(3))
+                .withMaterialFormat(stringProperties.get(4))
+                .withGoal(stringProperties.get(5))
+                .withReminderTitle(stringProperties.get(6))
+                .withReminderDescription(stringProperties.get(7))
+                .withMainTaskTitle(stringProperties.get(8))
+                .withMainHabit(stringProperties.get(9))
+                .withMainCardStudy(stringProperties.get(10))
+                .build();
+        setUpWeek(config);
     }
 
-    public void handleSetUpWeek(List<String> stringProperties){
-        setUpWeek(stringProperties.get(0), stringProperties.get(1), stringProperties.get(2), stringProperties.get(3),
-                stringProperties.get(4), stringProperties.get(5), stringProperties.get(6), stringProperties.get(7),
-                stringProperties.get(8), stringProperties.get(9), stringProperties.get(10));
+    public void setUpWeek(WeekSetupData config) {
+        this.lastWeekConfig = config;
+        this.weekResponsibilities = new ArrayList<>(Arrays.asList(
+                config.getPlanName(),
+                config.getObjectiveTitle(),
+                config.getObjectiveDescription(),
+                config.getMaterialTopic(),
+                config.getMaterialFormat(),
+                config.getGoal(),
+                config.getReminderTitle(),
+                config.getReminderDescription(),
+                config.getMainTaskTitle(),
+                config.getMainHabit(),
+                config.getMainCardStudy()
+        ));
     }
 
+
+    public void addReference(Reference reference) {
+        studyMaterial.addReference(reference);
+    }
 
     public void addRegistry(Registry registry){
         registryList.add(registry);
