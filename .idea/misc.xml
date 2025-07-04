@@ -11,7 +11,7 @@
   <component name="PDMPlugin">
     <option name="customRuleSets">
       <list>
-        <option value="C:\Users\ander\Downloads\LLMCodeSmellRefactor-main (1)\LLMCodeSmellRefactor-main\rules.xml" />
+        <option value="C:\Users\reset\OneDrive\Área de Trabalho\Projetos\CodeSmellRefactorSoftwareQuality\rules.xml" />
       </list>
     </option>
     <option name="options">
