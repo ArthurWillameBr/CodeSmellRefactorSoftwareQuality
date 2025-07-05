@@ -7,10 +7,7 @@ import org.example.studymaterial.VideoReference;
 import org.example.studyregistry.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.example.controllers.MainController.getInput;
 import static org.example.controllers.MainController.validateInput;
@@ -89,13 +86,35 @@ public class StudyRegistryController {
 
     private void handleSetSteps(StudyPlan studyPlan){
         handleMethodHeader("(Study Plan Edit)");
-        System.out.println("Type the following info: String firstStep, String resetStudyMechanism, String consistentStep, " +
-                "String seasonalSteps, String basicSteps, String mainObjectiveTitle, String mainGoalTitle, String mainMaterialTopic, " +
-                "String mainTask, @NotNull  Integer numberOfSteps, boolean isImportant. " +
-                "The Date to start is today, the date to end is x days from now, type the quantity of days\n");
-        LocalDateTime createdAT = LocalDateTime.now();
-        studyPlan.assignSteps(getInput(), getInput(), getInput(), getInput(), getInput(), getInput(), getInput(), getInput(), getInput(),
-                Integer.parseInt(getInput()), Boolean.parseBoolean(getInput()), createdAT, createdAT.plusDays(Long.parseLong(getInput())));
+        System.out.println("Type the following info: firstStep, resetStudyMechanism, consistentStep, seasonalSteps, basicSteps, mainObjectiveTitle, mainGoalTitle, mainMaterialTopic, mainTask, numberOfSteps, isImportant, daysUntilEnd");
+        LocalDateTime now = LocalDateTime.now();
+
+        // Coleta das 9 Strings
+        List<String> props = Arrays.asList(
+                getInput(), getInput(), getInput(), getInput(), getInput(),
+                getInput(), getInput(), getInput(), getInput()
+        );
+        Integer numberOfSteps = Integer.parseInt(getInput());
+        Boolean isImportant   = Boolean.parseBoolean(getInput());
+        Long daysUntilEnd     = Long.parseLong(getInput());
+
+        StudyPlanStepsData data = new StudyPlanStepsData.Builder()
+                .withFirstStep(props.get(0))
+                .withResetStudyMechanism(props.get(1))
+                .withConsistentStep(props.get(2))
+                .withSeasonalSteps(props.get(3))
+                .withBasicSteps(props.get(4))
+                .withMainObjectiveTitle(props.get(5))
+                .withMainGoalTitle(props.get(6))
+                .withMainMaterialTopic(props.get(7))
+                .withMainTask(props.get(8))
+                .withNumberOfSteps(numberOfSteps)
+                .withIsImportant(isImportant)
+                .withStartDate(now)
+                .withEndDate(now.plusDays(daysUntilEnd))
+                .build();
+
+        studyPlan.handleAssignSteps(data);
     }
 
     private StudyGoal getStudyGoalInfo(){
