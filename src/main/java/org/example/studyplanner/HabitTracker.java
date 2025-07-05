@@ -1,15 +1,13 @@
 package org.example.studyplanner;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class HabitTracker {
-    private List<Habit> habits;
-    private Map<Integer, List<LocalDateTime>> tracker;
-    private Integer nextId;
-
+    private List<Habit> habits = new ArrayList<>();
+    private Map<Integer, List<LocalDateTime>> tracker = new HashMap<>();
+    private int nextId = 1;
     private static HabitTracker instance;
 
     public static HabitTracker getHabitTracker() {
@@ -27,57 +25,70 @@ public class HabitTracker {
 
     @Override
     public String toString() {
-        StringBuilder response = new StringBuilder();
-        for (Habit habit : habits) {
-            response.append(habit.toString()).append(", ");
-        }
-        return "Habits: " + response.toString();
+        StringBuilder sb = new StringBuilder("Habits: ");
+        habits.forEach(h -> sb.append(h).append(", "));
+        return sb.toString();
     }
 
-    public Habit getHabitById(Integer id){
-        return this.habits.stream()
-                .filter(habit -> Objects.equals(habit.getId(), id))
+    public Habit getHabitById(int id) {
+        return habits.stream()
+                .filter(h -> h.getId() == id)
                 .findFirst().orElse(null);
     }
 
     public List<Habit> getHabits() {
-        return this.habits;
+        return Collections.unmodifiableList(habits);
     }
 
-    public String formatHabitDate(LocalDateTime date){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-
-        return date.format(formatter);
+    public String formatHabitDate(LocalDateTime date) {
+        return date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss"));
     }
 
     public List<Integer> getTrackerKeys(){
         return this.tracker.keySet().stream().toList();
     }
 
-    public int addHabit(String name, String motivation, Integer dailyMinutesDedication, Integer dailyHoursDedication, Integer year, Integer month, Integer day, Integer hour, Integer minute, Integer seconds, Boolean isConcluded) {
-        LocalTime lt = LocalTime.of(dailyHoursDedication, dailyMinutesDedication);
-        LocalDateTime startDate = LocalDateTime.of(year, month, day, hour, minute, seconds);
-        Habit habit = new Habit(name, motivation, lt, this.nextId, startDate, isConcluded);
-        this.habits.add(habit);
-        int response = nextId;
-        this.tracker.put(nextId, new ArrayList<>());
-        this.nextId++;
-        return response;
+    /**
+     * Refatorado: recebe HabitCreationData ao invés de 11 parâmetros.
+     */
+    public int addHabit(HabitCreationData data) {
+        Habit habit = new Habit(
+                data.getName(),
+                data.getMotivation(),
+                data.getDailyDedicationTime(),
+                nextId,
+                data.getStartDate(),
+                data.isConcluded()
+        );
+        habits.add(habit);
+        tracker.put(nextId, new ArrayList<>());
+        return nextId++;
     }
-
-    public int handleAddHabitAdapter(List<String> stringProperties, List<Integer> intProperties, boolean isConcluded){
-        return addHabit(stringProperties.get(0), stringProperties.get(1), intProperties.get(0), intProperties.get(1), intProperties.get(2), intProperties.get(3), intProperties.get(4), intProperties.get(5), intProperties.get(6), intProperties.get(7), isConcluded);
-    }
-
 
     public int addHabit(String name, String motivation) {
+        Habit habit = new Habit(name, motivation, nextId);
+        habits.add(habit);
+        tracker.put(nextId, new ArrayList<>());
+        return nextId++;
+    }
 
-        Habit habit = new Habit(name, motivation, this.nextId);
-        this.habits.add(habit);
-        int response = nextId;
-        this.tracker.put(nextId, new ArrayList<>());
-        this.nextId++;
-        return response;
+    public int handleAddHabitAdapter(List<String> stringProps, List<Integer> intProps, boolean isConcluded) {
+        HabitCreationData data = new HabitCreationData.Builder()
+                .withName(stringProps.get(0))
+                .withMotivation(stringProps.get(1))
+                .withDailyDedication(intProps.get(1), intProps.get(0))
+                .withStartDate(LocalDateTime.of(
+                        intProps.get(2), intProps.get(3), intProps.get(4),
+                        intProps.get(5), intProps.get(6), intProps.get(7)
+                ))
+                .concluded(isConcluded)
+                .build();
+        return addHabit(data);
+    }
+
+    public void removeHabit(int id) {
+        habits.removeIf(h -> h.getId() == id);
+        tracker.remove(id);
     }
 
     public void addHabitRecord(Integer id){
@@ -104,11 +115,11 @@ public class HabitTracker {
     public List<String> searchInHabits(String search){
         List<String> habits = new ArrayList<>();
         for (Habit habit : this.habits) {
-            if (habit.getName().toLowerCase().contains(search.toLowerCase()) || habit.getMotivation().toLowerCase().contains(search.toLowerCase())) {
+            if (habit.getName().toLowerCase().contains(search.toLowerCase()) ||
+                    habit.getMotivation().toLowerCase().contains(search.toLowerCase())) {
                 habits.add(habit.toString());
             }
         }
         return habits;
     }
-
 }
