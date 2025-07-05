@@ -52,17 +52,6 @@ public class StudyRegistryController {
         studyTaskManager.addRegistry(task);
     }
 
-    private void handleSetObjective(StudyObjective objective){
-        handleMethodHeader("(Study Objective Edit)");
-        System.out.println("Type the following info: Integer id, Integer priority " +
-                "Integer practicedDays, int day, int month, int year, String name, String title, String description, " +
-                "String topic, String objectiveInOneLine, String objectiveFullDescription, String motivation, " +
-                "Double duration, boolean isActive  \n");
-        objective.handleSetObjective(Integer.parseInt(getInput()), Integer.parseInt(getInput()),Integer.parseInt(getInput()),Integer.parseInt(getInput()),Integer.parseInt(getInput()),
-                Integer.parseInt(getInput()), getInput(), getInput(), getInput(), getInput(), getInput(), getInput(), getInput(),
-                Double.parseDouble(getInput()), Boolean.parseBoolean(getInput()));
-    }
-
     private StudyObjective getStudyObjectiveInfo(){
         handleMethodHeader("(Study Objective Creation)");
         System.out.println("Type the following info: title, description \n");
@@ -72,6 +61,46 @@ public class StudyRegistryController {
         handleSetObjective(studyObjective);
         studyTaskManager.addRegistry(studyObjective);
         return studyObjective;
+    }
+
+    private void handleSetObjective(StudyObjective objective){
+        handleMethodHeader("(Study Objective Edit)");
+        System.out.println("Type the following info: Integer id, Integer priority " +
+                "Integer practicedDays, int day, int month, int year, String name, String title, String description, " +
+                "String topic, String objectiveInOneLine, String objectiveFullDescription, String motivation, " +
+                "Double duration, boolean isActive  \n");
+        new ObjectiveEditor(objective).execute();
+    }
+
+    private class ObjectiveEditor {
+        private final StudyObjective objective;
+
+        public ObjectiveEditor(StudyObjective objective) {
+            this.objective = objective;
+        }
+
+        public void execute() {
+            StudyObjectiveData data = collectInputsAndBuildData();
+            objective.handleSetObjective(data);
+        }
+
+        private StudyObjectiveData collectInputsAndBuildData() {
+            return new StudyObjectiveData.Builder()
+                    .withId(Integer.parseInt(getInput()))
+                    .withPriority(Integer.parseInt(getInput()))
+                    .withPracticedDays(Integer.parseInt(getInput()))
+                    .withDate(Integer.parseInt(getInput()), Integer.parseInt(getInput()), Integer.parseInt(getInput()))
+                    .withName(getInput())
+                    .withTitle(getInput())
+                    .withDescription(getInput())
+                    .withTopic(getInput())
+                    .withObjectiveInOneLine(getInput())
+                    .withObjectiveFullDescription(getInput())
+                    .withMotivation(getInput())
+                    .withDuration(Double.parseDouble(getInput()))
+                    .isActive(Boolean.parseBoolean(getInput()))
+                    .build();
+        }
     }
 
     private StudyPlan getStudyPlanInfo(){
