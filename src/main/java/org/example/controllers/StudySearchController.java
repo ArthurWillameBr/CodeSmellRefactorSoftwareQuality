@@ -36,6 +36,16 @@ public class StudySearchController {
         System.out.println("???" + header + "!!!\n");
     }
 
+    private String formatSearchLog(SearchLog log) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(log.getLogName())
+                .append(" was used: ")
+                .append(log.getNumUsages())
+                .append(" times\nSearch Log\n")
+                .append(String.join(", ", log.getSearchHistory()));
+        return sb.toString();
+    }
+
     private void handleGeneralSearch(){
         handleMethodHeader("(General Search)");
         System.out.println("Type search text: ");
@@ -66,27 +76,23 @@ public class StudySearchController {
         System.out.println(String.join(", ", response));
     }
 
-    private void handleGetGeneralSearchLog(){
+    private void handleGetGeneralSearchLog() {
         handleMethodHeader("(Get Search Log)");
         SearchLog generalLog = generalSearch.getSearchLog();
-        String response = generalLog.getLogName() + " was used: " + generalLog.getNumUsages() + " times\nSearch Log\n";
-        response += String.join(", ", generalLog.getSearchHistory());
+        String response = formatSearchLog(generalLog);
         System.out.println(response);
     }
 
     private void handleGetMaterialSearchLog(){
         handleMethodHeader("(Get Search Log)");
         SearchLog materialLog = materialSearch.getSearchLog();
-        String response = materialLog.getLogName() + " was used: " + materialLog.getNumUsages() + " times\nSearch Log\n";
-        response += String.join(", ", materialLog.getSearchHistory());
-        System.out.println(response);
+        System.out.println(formatSearchLog(materialLog));
     }
 
     private void handleGetRegistrySearchLog(){
         handleMethodHeader("(Get Search Log)");
         SearchLog registryLog = registrySearch.getSearchLog();
-        String response = registryLog.getLogName() + " was used: " + registryLog.getNumUsages() + " times\nSearch Log\n";
-        response += String.join(", ", registryLog.getSearchHistory());
+        String response = formatSearchLog(registryLog);
         System.out.println(response);
     }
 
@@ -115,3 +121,4 @@ public class StudySearchController {
                """);
     }
 }
+
