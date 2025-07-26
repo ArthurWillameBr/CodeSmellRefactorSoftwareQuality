@@ -1,7 +1,6 @@
 package org.example.studyregistry;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,16 +36,46 @@ public class StudyPlan extends Registry{
         steps.add(toAdd);
     }
 
-    public void assignSteps(String firstStep, String resetStudyMechanism, String consistentStep, String seasonalSteps,
-                            String basicSteps, String mainObjectiveTitle, String mainGoalTitle, String mainMaterialTopic,
-                            String mainTask, Integer numberOfSteps, boolean isImportant, LocalDateTime startDate, LocalDateTime endDate) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
-
-        this.steps = new ArrayList<>(Arrays.asList(firstStep, resetStudyMechanism, consistentStep, seasonalSteps, basicSteps, "Number of steps: " + numberOfSteps.toString(), "Is it important to you? " + isImportant, startDate.format(formatter), endDate.format(formatter), mainObjectiveTitle, mainGoalTitle, mainMaterialTopic, mainTask));
+    public void assignSteps(StudyPlanStepsData data) {
+        this.steps = new ArrayList<>(Arrays.asList(
+                data.getFirstStep(),
+                data.getResetStudyMechanism(),
+                data.getConsistentStep(),
+                data.getSeasonalSteps(),
+                data.getBasicSteps(),
+                "Number of steps: " + data.getStepsCount(),
+                "Is it important to you? " + data.getIsImportant(),
+                data.getFormattedStartDate(),
+                data.getFormattedEndDate(),
+                data.getMainObjectiveTitle(),
+                data.getMainGoalTitle(),
+                data.getMainMaterialTopic(),
+                data.getMainTask()
+        ));
     }
 
-    public void handleAssignSteps(List<String> stringProperties, Integer numberOfSteps, boolean isImportant, LocalDateTime startDate, LocalDateTime endDate){
-        assignSteps(stringProperties.get(0), stringProperties.get(1), stringProperties.get(2), stringProperties.get(3), stringProperties.get(4), stringProperties.get(5), stringProperties.get(6), stringProperties.get(7), stringProperties.get(8), numberOfSteps, isImportant, startDate, endDate);
+    public void handleAssignSteps(StudyPlanStepsData data){
+        assignSteps(data);
     }
 
+    public void handleAssignSteps(List<String> stringProperties, Integer numberOfSteps,
+                                  boolean isImportant, LocalDateTime startDate, LocalDateTime endDate){
+        StudyPlanStepsData data = new StudyPlanStepsData.Builder()
+                .withFirstStep(stringProperties.get(0))
+                .withResetStudyMechanism(stringProperties.get(1))
+                .withConsistentStep(stringProperties.get(2))
+                .withSeasonalSteps(stringProperties.get(3))
+                .withBasicSteps(stringProperties.get(4))
+                .withMainObjectiveTitle(stringProperties.get(5))
+                .withMainGoalTitle(stringProperties.get(6))
+                .withMainMaterialTopic(stringProperties.get(7))
+                .withMainTask(stringProperties.get(8))
+                .withNumberOfSteps(numberOfSteps)
+                .withIsImportant(isImportant)
+                .withStartDate(startDate)
+                .withEndDate(endDate)
+                .build();
+
+        handleAssignSteps(data);
+    }
 }

@@ -30,17 +30,32 @@ public class AudioReference extends Reference {
         this.audioQuality = audioQuality;
     }
 
-     public void editAudio(AudioQuality audioQuality, boolean isDownloadable, String title, String description, String link, String accessRights, String license, String language, int rating,  int viewCount, int shareCount){
-        editBasic(title, description, link);
-        this.setAccessRights(accessRights);
-        this.setLicense(license);
-        this.setAudioQuality(audioQuality);
-        editVideoAttributes(rating, language, viewCount, shareCount, isDownloadable);
-     }
+    public void editAudio(AudioEditData data){
+        editBasic(data.getTitle(), data.getDescription(), data.getLink());
+        this.setAccessRights(data.getAccessRights());
+        this.setLicense(data.getLicense());
+        this.setAudioQuality(data.getAudioQuality());
+        editVideoAttributes(data.getRating(), data.getLanguage(), data.getViewCount(), data.getShareCount(), data.isDownloadable());
+    }
 
-     public void editAudioAdapter(List<String> properties, List<Integer> intProperties, AudioQuality audioQuality, boolean isDownloadable){
-         this.editAudio(audioQuality, isDownloadable, properties.get(0), properties.get(1), properties.get(2), properties.get(3), properties.get(4), properties.get(5), intProperties.get(0),  intProperties.get(1), intProperties.get(2));
-     }
+
+    public void editAudioAdapter(List<String> properties, List<Integer> intProperties, AudioQuality audioQuality, boolean isDownloadable){
+        AudioEditData data = new AudioEditData.Builder()
+                .withAudioQuality(audioQuality)
+                .isDownloadable(isDownloadable)
+                .withTitle(properties.get(0))
+                .withDescription(properties.get(1))
+                .withLink(properties.get(2))
+                .withAccessRights(properties.get(3))
+                .withLicense(properties.get(4))
+                .withLanguage(properties.get(5))
+                .withRating(intProperties.get(0))
+                .withViewCount(intProperties.get(1))
+                .withShareCount(intProperties.get(2))
+                .build();
+
+        this.editAudio(data);
+    }
 
      private void editVideoAttributes(int rating, String language, int viewCount, int shareCount,boolean isDownloadable){
          this.setRating(rating);

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-
 public class StudyPlannerController {
     private Map<String, Runnable> actions = new HashMap<>();
     private static TodoTracker todoTracker = TodoTracker.getInstance();
@@ -111,13 +110,23 @@ public class StudyPlannerController {
     }
 
     private void handleAddHabit(){
-        System.out.println("Separate the input with enter, type: name, motivation, daily Minutes Dedication, daily Hours Dedication, year, month, day, hour, minute, seconds");
+        System.out.println("Separate o input com enter, digite: name, motivation, daily Minutes Dedication, daily Hours Dedication, year, month, day, hour, minute, seconds");
         String name = Objects.requireNonNull(this.getInput().trim());
         String motivation = Objects.requireNonNull(this.getInput().trim());
         Integer dailyMinutesDedication = Integer.parseInt(Objects.requireNonNull(this.getInput().trim()));
         Integer dailyHoursDedication = Integer.parseInt(Objects.requireNonNull(this.getInput().trim()));
-        LocalDateTime start =  handleGetStartDate();
-        habitTracker.addHabit(name, motivation, dailyMinutesDedication, dailyHoursDedication, start.getYear(), start.getMonthValue(), start.getDayOfMonth(), start.getHour(), start.getMinute(), start.getSecond(), false);
+        LocalDateTime start = handleGetStartDate();
+
+        HabitCreationData.Builder builder = new HabitCreationData.Builder();
+        HabitCreationData data = builder
+                .withName(name)
+                .withMotivation(motivation)
+                .withDailyDedication(dailyHoursDedication, dailyMinutesDedication)
+                .withStartDate(start)
+                .concluded(false)
+                .build();
+
+        habitTracker.addHabit(data);
     }
 
     private String viewToDoHeader(){
