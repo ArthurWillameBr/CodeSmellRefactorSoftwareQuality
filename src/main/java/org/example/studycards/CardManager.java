@@ -24,7 +24,10 @@ public class CardManager {
 
     public String formatCard(Integer id) {
         Card card = this.getCard(id);
-        return "[id: " + id + "] " + "Question: " + card.getQuestion() + " Answer: " + card.getAnswer();
+        if (card == null) {
+            return "[id: " + id + "] Card not found.";
+        }
+        return "[id: " + id + "] " + card.toString();
     }
 
     public Map<Integer, Card> getCardsMap(){
@@ -51,10 +54,7 @@ public class CardManager {
     }
 
     public Integer addCard(String question, String answer) {
-        if(validateCard(question, answer)) {
-            throw new IllegalArgumentException("Invalid question or answer");
-        }
-        Card card = new Card(question, answer);
+        Card card = new Card(question, answer); // Throws IllegalArgumentException if data is invalid
         Integer response = nextID;
         cards.put(nextID, card);
         nextID++;
@@ -66,26 +66,24 @@ public class CardManager {
     }
 
     public void updateCard(Integer id, String question, String answer) {
-        if(validateCard(question, answer)) {
-            throw new IllegalArgumentException("Invalid question or answer");
-        }
         Card card = cards.get(id);
-        card.edit(question, answer);
+        if (card != null) {
+            card.edit(question, answer); // Throws IllegalArgumentException if data is invalid
+        }
     }
 
     private boolean validateCard(String question, String answer) {
         return question == null || question.isEmpty() || answer == null || answer.isEmpty();
     }
 
-    public List<String> searchInCards(String search){
+    public List<String> searchInCards(String search) {
         List<String> responseCards = new ArrayList<>();
-        for (int id : cards.keySet()) {
-            Card card = cards.get(id);
-            if(card.getQuestion().contains(search) || card.getAnswer().contains(search)){
-                responseCards.add(formatCard(id));
+        for (Map.Entry<Integer, Card> entry : cards.entrySet()) {
+            Card card = entry.getValue();
+            if (card.contains(search)) {
+                responseCards.add(formatCard(entry.getKey()));
             }
         }
         return responseCards;
     }
-
 }
